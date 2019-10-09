@@ -31,6 +31,13 @@ class SmsCodeView(View):
         image_code = request.GET.get('image_code')
 
         # 验证
+        # 连接redis
+        redis_cli = get_redis_connection('sms_code')
+
+        # 0.是否60秒内
+        if redis_cli.get(mobile + '_flag') is not None:
+            return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '发送短信太频繁，请稍候再发'})
+
         # 1.非空
         if not all([uuid, image_code]):
             return JsonResponse({'code': RETCODE.IMAGECODEERR, 'errmsg': '图形验证码已过期，点击图片换一个'})
@@ -56,8 +63,11 @@ class SmsCodeView(View):
         sms_code = '%06d' % random.randint(0, 999999)
 
         # 2.存入redis
-        redis_cli = get_redis_connection('sms_code')
-        redis_cli.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
+        # redis_cli.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
+        redis_pl = redis_cli.pipeline()
+        redis_pl.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
+        redis_pl.setex(mobile + '_flag', constants.SMS_CODE_FLAG, 1)
+        redis_pl.execute()
 
         # 3.发短信
         # ccp = CCP()

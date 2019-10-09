@@ -54,6 +54,7 @@ class RegisterView(View):
             return HttpResponseForbidden('短信验证码已经过期')
         # 3.删除短信验证码，不可以使用第二次
         redis_cli.delete(mobile)
+        redis_cli.delete(mobile + '_flag')
         # 4.判断是否正确
         if sms_code_redis.decode() != sms_code:
             return HttpResponseForbidden('短信验证码错误')
