@@ -51,6 +51,7 @@ class RegisterView(View):
         sms_code_redis = redis_cli.get(mobile)
         # 2.判断是否过期
         if sms_code_redis is None:
+            print(sms_code_redis)
             return HttpResponseForbidden('短信验证码已经过期')
         # 3.删除短信验证码，不可以使用第二次
         redis_cli.delete(mobile)

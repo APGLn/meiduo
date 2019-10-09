@@ -72,7 +72,7 @@ class SmsCodeView(View):
         # 3.发短信
         # ccp = CCP()
         # ccp.send_template_sms(mobile, [sms_code, constants.SMS_CODE_EXPIRES / 60], 1)
-        print(sms_code)
+        print(sms_code, redis_cli.get(mobile))
 
         # 响应
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})
