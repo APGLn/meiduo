@@ -70,14 +70,14 @@ class SmsCodeView(View):
         redis_pl.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
         redis_pl.setex(mobile + '_flag', constants.SMS_CODE_FLAG, 1)
         redis_pl.execute()
-        # redis_cli.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
-        # redis_cli.setex(mobile + '_flag', constants.SMS_CODE_FLAG, 1)
+        # redis_cli1.setex(mobile, constants.SMS_CODE_EXPIRES, sms_code)
+        # redis_cli1.setex(mobile + '_flag', constants.SMS_CODE_FLAG, 1)
 
 
         # 3.发短信
         # ccp = CCP()
         # ccp.send_template_sms(mobile, [sms_code, constants.SMS_CODE_EXPIRES / 60], 1)
-        # print(sms_code)
+        # print(sms_code, redis_cli1.get(mobile) )
         # 通过delay调用，可以将任务加到队列中，交给celery去执行
         send_sms.delay(mobile, sms_code)
         # time.sleep(1)
