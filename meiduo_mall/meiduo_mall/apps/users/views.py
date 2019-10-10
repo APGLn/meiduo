@@ -3,7 +3,7 @@ from django.views import View
 from django.http import HttpResponseForbidden, JsonResponse
 import re
 from .models import User
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from meiduo_mall.utils.response_code import RETCODE
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
@@ -132,3 +132,15 @@ class LoginView(View):
             response.set_cookie('username', username, max_age=constants.USERNAME_COOKIE_EXPIRES)
 
             return response
+
+
+class LogoutView(View):
+    def get(self, request):
+        # 删除状态保持
+        logout(request)
+
+        # 删除cookie中的username
+        response = redirect('/')
+        response.delete_cookie('username')
+
+        return response
