@@ -7,7 +7,7 @@ from django.contrib.auth import login
 from meiduo_mall.utils.response_code import RETCODE
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
-
+from . import constants
 
 # Create your views here.
 
@@ -126,4 +126,9 @@ class LoginView(View):
         else:
             # 用户名和密码正确
             login(request, user)
-            return redirect('/')
+
+            # 向cookie中写用户名，用于客户端显示
+            response = redirect('/')
+            response.set_cookie('username', username, max_age=constants.USERNAME_COOKIE_EXPIRES)
+
+            return response
