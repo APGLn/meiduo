@@ -8,6 +8,7 @@ from meiduo_mall.utils.response_code import RETCODE
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
 from . import constants
+from meiduo_mall.utils.login import LoginRequiredMixin
 
 # Create your views here.
 
@@ -113,6 +114,7 @@ class LoginView(View):
         # 接收
         username = request.POST.get('username')
         pwd = request.POST.get('pwd')
+        next_url = request.GET.get('next', '/')
 
         # 验证：根据用户名查询，找到对象后再对比密码
         '''
@@ -128,7 +130,7 @@ class LoginView(View):
             login(request, user)
 
             # 向cookie中写用户名，用于客户端显示
-            response = redirect('/')
+            response = redirect(next_url)
             response.set_cookie('username', username, max_age=constants.USERNAME_COOKIE_EXPIRES)
 
             return response
@@ -144,3 +146,13 @@ class LogoutView(View):
         response.delete_cookie('username')
 
         return response
+
+
+class UserCenterInfoView(LoginRequiredMixin, View):
+    def get(self, request):
+        # if request.user.is_authenticated:
+        #     return render(request, 'user_center_info.html')
+        # else:
+        #     return redirect('/login/')
+
+        return render(request, 'user_center_info.html')
